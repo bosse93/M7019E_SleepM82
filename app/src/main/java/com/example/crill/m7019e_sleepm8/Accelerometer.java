@@ -7,7 +7,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static java.lang.Math.abs;
 
@@ -21,10 +22,10 @@ public class Accelerometer extends MainActivity implements SensorEventListener {
     private Sensor mAccelerometer;
 
     float [] history = new float[2];
-    private boolean changed = false;
+    private long sensorTimeMs;
     private float sensitivity = 5;
 
-    //Commit Test
+
 
     //constructor
     public Accelerometer(Context context) {
@@ -38,7 +39,7 @@ public class Accelerometer extends MainActivity implements SensorEventListener {
 
 
 
-
+    /** Register & unregister needed to override paus and resume functions by handling listeners **/
     public void register() {
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -47,10 +48,26 @@ public class Accelerometer extends MainActivity implements SensorEventListener {
         mSensorManager.unregisterListener(this);
     }
 
-    public void setChanged(){
-        changed = false;
+
+    /** Getters and setters **/
+    public Long getSensorTimeMs() {
+        return sensorTimeMs;
     }
 
+    public void setSensitivity(float sensitivity) {
+        this.sensitivity = sensitivity;
+    }
+
+    public float getSensitivity() {
+        return sensitivity;
+    }
+
+    /** On change
+     *  Checks for delta change
+     *  acts depending on sensitivity
+     *  updates date
+     *
+     *  **/
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -64,19 +81,20 @@ public class Accelerometer extends MainActivity implements SensorEventListener {
             history[0] = event.values[0];
             history[1] = event.values[1];
 
+            sensorTimeMs = Calendar.getInstance().getTimeInMillis();
+
             if (abs(xChange) > sensitivity){
-                changed = true;
-                Log.d("test", "xChanged");
+                Log.d("test", "xChanged" + sensorTimeMs);
             }
 
             if (abs(yChange) > sensitivity){
-                changed = true;
-                Log.d("test", "yChanged");
+                Log.d("test", "yChanged" + sensorTimeMs);
             }
         }
 
     }
 
+    /** needed **/
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 

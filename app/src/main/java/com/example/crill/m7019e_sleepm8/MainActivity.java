@@ -4,12 +4,21 @@ import android.content.Intent;
 import android.provider.AlarmClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     Accelerometer sensors = null;
+    private Date currentTime = Calendar.getInstance().getTime();
+    private boolean isSleeping = false;
     float x = 0;
 
 
@@ -40,10 +49,29 @@ public class MainActivity extends AppCompatActivity {
         test.setOnClickListener((
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        sensors.setChanged();
+                        Log.d("test", String.valueOf(sensors.getSensorTimeMs()));
+                        getAlarmTime();
                     }
                 }
         ));
+
+
+    }
+
+    public long getAlarmTime(){
+        EditText datePicker = (EditText)findViewById(R.id.alarmTime);
+        int alarmTime = Integer.parseInt(datePicker.getText().toString());
+        long alarmTimeMS = alarmTime*60*60*1000; // hh*mm*ss*ms
+        Log.d("test ALARMTIME", String.valueOf(alarmTime));
+        return alarmTimeMS;
+    }
+
+
+    public boolean checkSleep(){
+        if ((sensors.getSensorTimeMs() + getAlarmTime()) >= System.currentTimeMillis()) {
+            return isSleeping = true;
+        }
+        return isSleeping = false;
     }
 
     @Override

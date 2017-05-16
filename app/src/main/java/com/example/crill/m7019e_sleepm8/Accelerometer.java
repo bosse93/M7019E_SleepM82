@@ -25,7 +25,7 @@ public class Accelerometer extends MainActivity implements SensorEventListener {
     private long sensorTimeMs;
     private float sensitivity = 5;
 
-
+    //COMMIT TEST
 
     //constructor
     public Accelerometer(Context context) {

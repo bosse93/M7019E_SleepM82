@@ -28,7 +28,9 @@ public class Accelerometer extends Service implements SensorEventListener {
 
     float [] history = new float[2];
     private long sensorTimeMs;
-    private float sensitivity = 5;
+    private int sensitivityPercent;
+    private double defaultSens = 10.0;
+    private double sensitivity;
 
     String message = null;
 
@@ -36,7 +38,10 @@ public class Accelerometer extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("test", "Start Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
-        message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        //message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        sensitivityPercent = intent.getIntExtra("sensitivity", 0);
+        sensitivity = ((defaultSens/100) * sensitivityPercent);  //fix seekbar to percentage
+        Log.d("test", "Changed sensitivty in acc "+sensitivity);
         handlerThread = new HandlerThread("MyHandlerThread");
         handlerThread.start();
 
@@ -91,21 +96,16 @@ public class Accelerometer extends Service implements SensorEventListener {
 
 
             if (abs(xChange) > sensitivity){
+                Log.d("test", "sensitivity: "+sensitivity);
                 sensorTimeMs = Calendar.getInstance().getTimeInMillis();
                 Log.d("test", "xChanged" + sensorTimeMs);
                 Log.d("test", "Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
-                Log.d("test", "" + message);
-
-
             }
 
             if (abs(yChange) > sensitivity){
                 sensorTimeMs = Calendar.getInstance().getTimeInMillis();
                 Log.d("test", "yChanged" + sensorTimeMs);
                 Log.d("test", "Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
-                Log.d("test", "" + message);
-
-
             }
         }
     }
@@ -115,16 +115,4 @@ public class Accelerometer extends Service implements SensorEventListener {
 
     }
 
-    /** Getters and setters **/
-    public Long getSensorTimeMs() {
-        return sensorTimeMs;
-    }
-
-    public void setSensitivity(float sensitivity) {
-        this.sensitivity = sensitivity;
-    }
-
-    public float getSensitivity() {
-        return sensitivity;
-    }
 }

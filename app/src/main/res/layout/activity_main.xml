@@ -25,21 +25,11 @@
         tools:layout_constraintTop_creator="1">
 
 
-
-
-        <Button
-            android:id="@+id/AlarmButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="Alarm" />
-
         <Button
             android:id="@+id/button2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/AlarmButton"
+            android:layout_alignParentStart="true"
             android:text="Button" />
 
         <EditText

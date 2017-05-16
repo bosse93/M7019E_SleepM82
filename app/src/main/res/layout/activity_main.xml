@@ -10,72 +10,70 @@
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
         android:layout_marginBottom="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1">
 
 
 
 
-            <Button
-                android:id="@+id/AlarmButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Alarm"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
+        <Button
+            android:id="@+id/AlarmButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="Alarm" />
 
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Button"
-                android:layout_below="@id/AlarmButton"
-                />
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/AlarmButton"
+            android:text="Button" />
 
-            <EditText
-                android:id="@+id/alarmTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="datetime"
-                android:hint="Hours inactive"
-                android:layout_below="@id/button2"
-                />
+        <EditText
+            android:id="@+id/alarmTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/button2"
+            android:ems="10"
+            android:hint="Hours inactive"
+            android:inputType="datetime"
+            />
 
+        <ToggleButton
+            android:id="@+id/activeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textOn="@string/activeButtonON"
+            android:textOff="@string/activeButtonOFF"
+            android:background="@drawable/activate_toggle_button"
+            android:textColor="@drawable/button_text_color"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp" />
 
-
-            <Button
-                android:id="@+id/activeButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/activeButton"
-                android:background="@drawable/button_selector"
-                android:layout_marginTop="5dp"
-                android:layout_alignParentBottom="true"
-                />
+        <!---->
 
         <Button
             android:id="@+id/sleepHistoryButton"
-            android:text="Sleep History"
-
             android:layout_width="wrap_content"
+            android:layout_marginBottom="5dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/sleep_history"
-            android:layout_centerHorizontal="true"
             android:layout_above="@id/activeButton"
-            />
-
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/sleep_history"
+            android:text="Sleep History" />
 
 
     </RelativeLayout>

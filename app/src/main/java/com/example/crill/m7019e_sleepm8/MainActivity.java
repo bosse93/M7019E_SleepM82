@@ -1,6 +1,7 @@
 package com.example.crill.m7019e_sleepm8;
 
 import android.content.Intent;
+import android.os.Looper;
 import android.provider.AlarmClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,14 +12,16 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ToggleButton;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+
+
 public class MainActivity extends AppCompatActivity {
-    Accelerometer sensors = null;
+    public static final String EXTRA_MESSAGE = "om.example.crill.m7019e_sleepm8.MESSAGE";
+    Intent sensors = null;
     private Date currentTime = Calendar.getInstance().getTime();
     private boolean isSleeping = false;
     float x = 0;
@@ -28,25 +31,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d("test", "Start Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
         //starting new sensor instance
-        sensors = new Accelerometer(this);
+        //sensors = new Accelerometer(this);
+        sensors = new Intent(this, Accelerometer.class);
+        String message = "Meddelande";
+        sensors.putExtra(EXTRA_MESSAGE, message);
+        startService(sensors);
 
+
+
+        Log.d("test", "Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
         /** intent för att göra larm, bara test **/
         final Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
-        i.putExtra(AlarmClock.EXTRA_MESSAGE, "New Alarm");
+        i.putExtra(EXTRA_MESSAGE, "New Alarm");
         i.putExtra(AlarmClock.EXTRA_HOUR, 10);
         i.putExtra(AlarmClock.EXTRA_MINUTES, 30);
+
 
         Button alarmButton = (Button) findViewById(R.id.AlarmButton);
         alarmButton.setOnClickListener((
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        startActivity(i);
+                        boolean a = stopService(sensors);
+                        Log.d("test", "Service stoped? " + a);
                     }
                 }
         ));
-
+/*
         Button test = (Button) findViewById(R.id.button2);
         test.setOnClickListener((
                 new Button.OnClickListener() {
@@ -56,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         ));
-
+*/
         /** Sleep history button **/
         Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
         sleepHistory.setOnClickListener(new View.OnClickListener() {
@@ -92,24 +104,13 @@ public class MainActivity extends AppCompatActivity {
         return alarmTimeMS;
     }
 
-
+/*
     public boolean checkSleep(){
         if ((sensors.getSensorTimeMs() + getAlarmTime()) >= System.currentTimeMillis()) {
             return isSleeping = true;
         }
         return isSleeping = false;
     }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        sensors.register();
-    }
-
-    @Override
-    protected void onPause(){
-        super.onPause();
-        sensors.unregister();
-    }
+*/
 
 }

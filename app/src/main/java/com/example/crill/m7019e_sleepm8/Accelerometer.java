@@ -81,13 +81,14 @@ public class Accelerometer extends MainActivity implements SensorEventListener {
             history[0] = event.values[0];
             history[1] = event.values[1];
 
-            sensorTimeMs = Calendar.getInstance().getTimeInMillis();
-
             if (abs(xChange) > sensitivity){
+                sensorTimeMs = Calendar.getInstance().getTimeInMillis();
                 Log.d("test", "xChanged" + sensorTimeMs);
+
             }
 
             if (abs(yChange) > sensitivity){
+                sensorTimeMs = Calendar.getInstance().getTimeInMillis();
                 Log.d("test", "yChanged" + sensorTimeMs);
             }
         }

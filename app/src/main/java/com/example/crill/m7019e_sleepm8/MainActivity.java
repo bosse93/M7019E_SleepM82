@@ -8,7 +8,9 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,6 +56,30 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         ));
+
+        /** Sleep history button **/
+        Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
+        sleepHistory.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Click event trigger here
+            }
+        });
+
+        /** Active button **/
+        ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                    Log.d("test", "toggle - ENABLED");
+                } else {
+                    // The toggle is disabled
+                    Log.d("test", "toggle - DISABLED");
+                }
+            }
+        });
+
+
 
 
     }

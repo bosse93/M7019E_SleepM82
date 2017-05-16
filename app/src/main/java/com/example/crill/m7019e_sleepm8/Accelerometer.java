@@ -35,7 +35,7 @@ public class Accelerometer extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("test", "Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
+        Log.d("test", "Start Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
         message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
         handlerThread = new HandlerThread("MyHandlerThread");
         handlerThread.start();
@@ -53,6 +53,7 @@ public class Accelerometer extends Service implements SensorEventListener {
     }
 
     public void register() {
+        Log.d("test", "Register Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL, handler);
     }
 
@@ -63,6 +64,7 @@ public class Accelerometer extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("test", "Destroy Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
         Log.d("test", "Service Destroyed");
         handlerThread.quitSafely();
         Log.d("test", "ThreadRemoved");
@@ -73,10 +75,6 @@ public class Accelerometer extends Service implements SensorEventListener {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    public HandlerThread getHandlerThread() {
-        return handlerThread;
     }
 
     @Override

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        Log.d("test", "Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
+        Log.d("test", "Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
         /** intent för att göra larm, bara test **/
         final Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
         i.putExtra(EXTRA_MESSAGE, "New Alarm");

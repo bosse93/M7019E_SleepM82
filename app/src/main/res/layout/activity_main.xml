@@ -4,39 +4,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#555555"
     tools:context="com.example.crill.m7019e_sleepm8.MainActivity">
 
     <RelativeLayout
-        android:layout_width="368dp"
-        android:layout_height="495dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="8dp">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+
+
 
             <Button
                 android:id="@+id/AlarmButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alarm" />
+                android:text="Alarm"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
 
             <Button
                 android:id="@+id/button2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="Button"
+                android:layout_below="@id/AlarmButton"
+                />
 
             <EditText
                 android:id="@+id/alarmTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="time"
-                android:hint="Alarm time"/>
+                android:inputType="datetime"
+                android:hint="Hours inactive"
+                android:layout_below="@id/button2"
+                />
 
-        </LinearLayout>
+
+
+            <Button
+                android:id="@+id/activeButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/activeButton"
+                android:background="@drawable/button_selector"
+                android:layout_marginTop="5dp"
+                android:layout_alignParentBottom="true"
+                />
+
+        <Button
+            android:id="@+id/sleepHistoryButton"
+            android:text="Sleep History"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sleep_history"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/activeButton"
+            />
+
+
+
     </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>

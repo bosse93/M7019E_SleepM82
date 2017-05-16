@@ -55,6 +55,23 @@ public class MainActivity extends AppCompatActivity {
                 }
         ));
 
+        /** Sleep history button **/
+        Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
+        sleepHistory.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Click event trigger here
+            }
+        });
+
+        Button activeButton = (Button) findViewById(R.id.activeButton);
+        activeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Click event trigger here
+            }
+        });
+
+
+
 
     }
 

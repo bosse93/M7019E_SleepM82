@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name="com.example.crill.m7019e_sleepm8.Accelerometer"/>
     </application>
 
 </manifest>

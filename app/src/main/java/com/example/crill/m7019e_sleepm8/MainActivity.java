@@ -1,10 +1,12 @@
 package com.example.crill.m7019e_sleepm8;
 
 import android.content.Intent;
-import android.provider.AlarmClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -33,13 +35,17 @@ public class MainActivity extends AppCompatActivity {
         //sensors = new Accelerometer(this);
         settings = new Intent(this, Settings.class);
 
+        //toolbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
 
         Button test = (Button) findViewById(R.id.button2);
         test.setOnClickListener((
                 new Button.OnClickListener() {
                     public void onClick(View v) {
 
-                        startActivityForResult(settings, 1);
+                        Log.d("test", "jag har ingen funktionalitet atm");
 
                     }
                 }
@@ -59,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    startSensorBackroud(sensitivity);
+                    startSensorBackground(sensitivity);
                     // The toggle is enabled
                     Log.d("test", "toggle - ENABLED");
                 } else {
@@ -73,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
     }
 
     public long getAlarmTime() {
@@ -83,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         return alarmTimeMS;
     }
 
-    public void startSensorBackroud(int sensitivity) {
+    public void startSensorBackground(int sensitivity) {
         sensors = new Intent(this, Accelerometer.class);
         sensors.putExtra("sensitivity", sensitivity);
         Log.d("test", "startSensorBackground :" + sensitivity);
@@ -112,5 +119,36 @@ public class MainActivity extends AppCompatActivity {
         return isSleeping = false;
     }
 */
+
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                Log.d("test", "Clicked toolbar action_settings");
+                startActivityForResult(settings, 1);
+                return true;
+
+            /**case R.id.action_test:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                Log.d("test", "Toolbar action_test");
+                return true; **/
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
 
 }

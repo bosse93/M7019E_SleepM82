@@ -2,4 +2,5 @@
     <string name="app_name">M7019E_SleepM8</string>
     <string name="activeButtonON">Alarm is activate</string>
     <string name="activeButtonOFF">Alarm is inactive</string>
+    <string name="action_setting">Settings</string>
 </resources>

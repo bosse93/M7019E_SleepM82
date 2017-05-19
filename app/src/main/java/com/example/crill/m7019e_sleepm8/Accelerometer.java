@@ -11,10 +11,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.annotation.Nullable;
+import android.os.PowerManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import java.util.Calendar;
-import java.util.Date;
 import static java.lang.Math.abs;
 
 
@@ -24,23 +23,49 @@ public class Accelerometer extends Service implements SensorEventListener {
     private boolean mInitialized;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private Handler handler = null;
+
+    private Handler handlerSensor = null;
+    private Handler handlerStartAlarm = null;
+    private Handler handlerRunAlarm = null;
+
+    private PowerManager.WakeLock wakeLockAlarm = null;
+
+    private Runnable runnableStartAlarm = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("test", "Larm schema lagt");
+            Log.d("test", "Runnable Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+            unregister();
+            //ÄNDRA 10000 TILL LARM TID
+            handlerRunAlarm = new Handler(handlerThread.getLooper());
+            handlerRunAlarm.postDelayed(runnableRunAlarm, 10000);
+        }
+    };
+
+    private Runnable runnableRunAlarm = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("test", "LarmLARM");
+            sendMessage("executeAlarm", 2);
+        }
+    };
 
     float [] history = new float[2];
-    private long sensorTimeMs;
     private int sensitivityPercent;
     private double defaultSens = 10.0;
     private double sensitivity;
-
-    String message = null;
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("test", "Start Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
-        //message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLockAlarm = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
+        wakeLockAlarm.acquire();
+
         sensitivityPercent = intent.getIntExtra("sensitivity", 0);
-        sensitivity = ((defaultSens/100) * sensitivityPercent);  //fix seekbar to percentage
+        sensitivity = ((defaultSens/100) * (100 - sensitivityPercent));  //fix seekbar to percentage
         Log.d("test", "Changed sensitivty in acc "+sensitivity);
         handlerThread = new HandlerThread("MyHandlerThread");
         handlerThread.start();
@@ -51,15 +76,20 @@ public class Accelerometer extends Service implements SensorEventListener {
         // Get Accelerometer sensor
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Log.d("test onCreateSensor", "det körs automagiskt när jag gör klassen");
-        handler = new Handler(handlerThread.getLooper());
+        handlerSensor = new Handler(handlerThread.getLooper());
         register();
+
+        //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
+        handlerStartAlarm = new Handler(handlerThread.getLooper());
+        handlerStartAlarm.postDelayed(runnableStartAlarm, 10000);
+
 
         return START_STICKY;
     }
 
     public void register() {
         Log.d("test", "Register Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL, handler);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL, handlerSensor);
     }
 
     public void unregister() {
@@ -69,9 +99,11 @@ public class Accelerometer extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        handlerStartAlarm.removeCallbacks(runnableStartAlarm);
+        wakeLockAlarm.release();
         Log.d("test", "Destroy Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
         Log.d("test", "Service Destroyed");
-        handlerThread.quitSafely();
+        handlerThread.quit();
         Log.d("test", "ThreadRemoved");
         unregister();
         Log.d("test", "SensorRemoved");
@@ -96,16 +128,15 @@ public class Accelerometer extends Service implements SensorEventListener {
 
 
             if (abs(xChange) > sensitivity){
-                Log.d("test", "sensitivity: "+sensitivity);
-                sensorTimeMs = Calendar.getInstance().getTimeInMillis();
-                Log.d("test", "xChanged" + sensorTimeMs);
-                Log.d("test", "Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+                //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
+                startAlarm(10000);
+                Log.d("test", "Sensor Change Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
             }
 
             if (abs(yChange) > sensitivity){
-                sensorTimeMs = Calendar.getInstance().getTimeInMillis();
-                Log.d("test", "yChanged" + sensorTimeMs);
-                Log.d("test", "Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+                //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
+                startAlarm(10000);
+                Log.d("test", "Sensor Change Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
             }
         }
     }
@@ -115,4 +146,14 @@ public class Accelerometer extends Service implements SensorEventListener {
 
     }
 
+    private void startAlarm(long alarmTime) {
+        handlerStartAlarm.removeCallbacks(runnableStartAlarm);
+        handlerStartAlarm.postDelayed(runnableStartAlarm, alarmTime);
+    }
+
+    public void sendMessage (String intentName, int message) {
+        Intent intent = new Intent(intentName);
+        intent.putExtra("message", message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 }

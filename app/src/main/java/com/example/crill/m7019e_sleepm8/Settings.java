@@ -13,12 +13,15 @@ public class Settings extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
         SeekBar seekbar = (SeekBar) findViewById(R.id.sensetivitySeekbar);
+        sensitivity = getIntent().getIntExtra("sensitivity", 50);
+        seekbar.setProgress(sensitivity);
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -41,7 +44,6 @@ public class Settings extends AppCompatActivity {
         Button angryButton = (Button) findViewById(R.id.angry_btn);
         angryButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            // Click event trigger here
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("sensitivity", sensitivity);
                 setResult(RESULT_OK, returnIntent);

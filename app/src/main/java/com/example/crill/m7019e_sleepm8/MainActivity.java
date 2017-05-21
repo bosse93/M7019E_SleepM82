@@ -80,26 +80,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-
-        Button test = (Button) findViewById(R.id.button2);
-        test.setOnClickListener((
-                new Button.OnClickListener() {
-                    public void onClick(View v) {
-
-                        Log.d("test", "jag har ingen funktionalitet atm");
-
-                    }
-                }
-        ));
-
-
-        /** Sleep history button **/
+        /** Sleep history button
         Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
         sleepHistory.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Click event trigger here
             }
-        });
+        });**/
 
         /** Active button **/
         ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);

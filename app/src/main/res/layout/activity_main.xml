@@ -23,22 +23,57 @@
 
 
 
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/my_toolbar"
-            android:text="Button" />
+    <TextView
+        android:id="@+id/alarmTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/my_toolbar"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="30dp"
+        android:ems="10"
+        android:text="Hours to sleep:"
+        android:textAlignment="center"
+        />
+    <TextView
+        android:id="@+id/timeColonTextView"
+        android:layout_width="10dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@+id/editTextHours"
+        android:ems="10"
+        android:text=":"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        />
 
-        <EditText
-            android:id="@+id/alarmTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/button2"
-            android:ems="10"
-            android:hint="Hours inactive"
-            android:inputType="datetime"
-            />
+    <EditText
+        android:id="@+id/editTextHours"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alarmTimeText"
+        android:layout_toLeftOf="@id/timeColonTextView"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:inputType="time"
+        android:hint="hh"
+        android:textAlignment="center"
+        android:selectAllOnFocus="true"
+        />
+
+
+
+    <EditText
+        android:id="@+id/editTextMinutes"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editTextHours"
+        android:layout_toRightOf="@id/timeColonTextView"
+        android:ems="10"
+        android:inputType="time"
+        android:textAlignment="center"
+        android:selectAllOnFocus="true"
+        android:hint="mm"
+        />
 
         <ToggleButton
             android:id="@+id/activeButton"
@@ -51,7 +86,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="0dp" />
 
-        <!---->
+        <!--
 
         <Button
             android:id="@+id/sleepHistoryButton"
@@ -61,7 +96,7 @@
             android:layout_above="@id/activeButton"
             android:layout_centerHorizontal="true"
             android:background="@drawable/sleep_history"
-            android:text="Sleep History" />
+            android:text="Sleep History" /> -->
 
 
     </RelativeLayout>

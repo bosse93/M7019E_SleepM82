@@ -21,8 +21,8 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        hoursTxt = (EditText) findViewById(R.id.editText2);
-        minTxt = (EditText) findViewById(R.id.editText4);
+        hoursTxt = (EditText) findViewById(R.id.editTextHours);
+        minTxt = (EditText) findViewById(R.id.editTextMinutes);
         timeFix(hoursTxt, getIntent().getIntExtra("hour", 0));
         timeFix(minTxt, getIntent().getIntExtra("minute", 30));
 
@@ -52,7 +52,7 @@ public class Settings extends AppCompatActivity {
             public void onClick(View v) {
                 int tempHour = isValidHour(hoursTxt);
                 int tempMin = isValidMinute(minTxt);
-                if((tempHour > 0) && (tempMin > 0)){
+                if((tempHour >= 0) && (tempMin >= 0)){
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("sensitivity", sensitivity);
                     returnIntent.putExtra("hour", tempHour);

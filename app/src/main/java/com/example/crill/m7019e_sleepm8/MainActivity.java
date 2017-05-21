@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ToggleButton;
 
 
@@ -36,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private PowerManager.WakeLock wakeLockAlarm = null;
 
     private int sensitivity = 50;
+    private long alarmTime = 10000;
     private int startAlarmTimeHour = 0;
-    private int startAlarmTimeMinute = 30;
+    private long startAlarmTimeMinute = 30;
 
     private Runnable runnableExecuteAlarm = new Runnable() {
         @Override
@@ -80,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+
+
         /** Sleep history button
         Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
         sleepHistory.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    fixAlarmTime();
+                    //Start background sensors (get this shit running)
                     startSensorBackground(sensitivity);
                 } else {
                     stopService(sensors);
@@ -108,10 +114,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private long fixAlarmTime(){
+        //Settings for alarmtime
+        EditText hoursTxt = (EditText) findViewById(R.id.editTextHours);
+        int hours = Integer.parseInt(hoursTxt.getText().toString());
+        EditText minTxt = (EditText) findViewById(R.id.editTextMinutes);
+        int minutes = Integer.parseInt(minTxt.getText().toString());
+        return convertHourToMilli(hours+minutes);
+    }
+
 
     public void startSensorBackground(int sensitivity) {
         sensors = new Intent(this, Accelerometer.class);
         sensors.putExtra("sensitivity", sensitivity);
+        sensors.putExtra("alarmtime", alarmTime);
         startService(sensors);
     }
 
@@ -132,11 +148,9 @@ public class MainActivity extends AppCompatActivity {
                     if(intent.getBooleanExtra("snooze", false)) {
                         startSnoozeAlarm(convertMinuteToMilli(5));
                     } else {
-                        //KNAPPEN FRÅN GRÖN TILL RÖD??
-                        stopService(sensors);
-                        if(wakeLockAlarm != null) {
-                            wakeLockAlarm.release();
-                        }
+                        //toggles the button in order to kill sensor thread.
+                        ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);
+                        toggle.toggle();
                     }
                 } else {
                     Log.d("test", "AlarmReturnFailed" + resultCode);
@@ -145,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Inflate the default menu forcing it to obey my rules.
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);

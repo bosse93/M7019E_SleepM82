@@ -54,6 +54,7 @@ public class Accelerometer extends Service implements SensorEventListener {
     private int sensitivityPercent;
     private double defaultSens = 10.0;
     private double sensitivity;
+    private long alarmTime;
 
 
     @Override
@@ -64,8 +65,13 @@ public class Accelerometer extends Service implements SensorEventListener {
         wakeLockAlarm = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         wakeLockAlarm.acquire();
 
+        //Fix seekbar
         sensitivityPercent = intent.getIntExtra("sensitivity", 0);
-        sensitivity = ((defaultSens/100) * (100 - sensitivityPercent));  //fix seekbar to percentage
+        sensitivity = ((defaultSens/100) * (100 - sensitivityPercent));
+
+        //Fix alarm time
+        alarmTime = intent.getLongExtra("alarmtime", 0);
+
         Log.d("test", "Changed sensitivty in acc "+sensitivity);
         handlerThread = new HandlerThread("MyHandlerThread");
         handlerThread.start();
@@ -81,7 +87,7 @@ public class Accelerometer extends Service implements SensorEventListener {
 
         //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
         handlerStartAlarm = new Handler(handlerThread.getLooper());
-        handlerStartAlarm.postDelayed(runnableStartAlarm, 10000);
+        handlerStartAlarm.postDelayed(runnableStartAlarm, alarmTime);
 
 
         return START_STICKY;

@@ -30,34 +30,11 @@ public class Alarm extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON + WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                 + WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED + WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
+
         //SETTING LAYOUT. launches the alarm activity when alarm is executed
         setContentView(R.layout.activity_alarm);
 
-
-
         startPlayingAlarm();
-
-
-        Log.d("test", "ALARM INTENT");
-
-        //SNOOZE KNAPP
-        Button angryButton = (Button) findViewById(R.id.angry_btn);
-        angryButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Click event trigger here
-                endAlarmActivity(false);
-            }
-        });
-
-        /*  KOD TILL AVSLUTA LARM KNAPP
-            endAlarmActivity(false);
-         */
-
-
-        /*
-            MEDIA PLAYER. LJUD? RENSA UPP I endAlarm.
-         */
-
 
         View view = this.findViewById(android.R.id.content);
         view.setOnTouchListener(new OnSwipeTouchListener(this) {
@@ -75,6 +52,7 @@ public class Alarm extends AppCompatActivity {
                 Log.d("test", "Swipe right");
             }
         });
+
 
 
     }

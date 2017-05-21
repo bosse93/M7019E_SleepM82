@@ -1,8 +1,6 @@
 package com.example.crill.m7019e_sleepm8;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ToggleButton;
 
 
@@ -38,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private PowerManager.WakeLock wakeLockAlarm = null;
 
     private int sensitivity = 50;
+    private long alarmTime = 10000;
+    private int startAlarmTimeHour = 0;
+    private long startAlarmTimeMinute = 30;
 
     private Runnable runnableExecuteAlarm = new Runnable() {
         @Override
@@ -50,17 +52,14 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
-            int intCase = intent.getIntExtra("message",1);
-            switch (intCase) {
+            int receiveCase = intent.getIntExtra("message",1);
+            switch (receiveCase) {
                 case 1:
                     //FAIL
                 case 2:
                     PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
                     wakeLockAlarm = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
                     wakeLockAlarm.acquire();
-                    Log.d("test", "" + intCase);
-                    //Första gången. 0 är rätt.
                     startSnoozeAlarm(0);
                     break;
             }
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("test", "Start Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+
         ActivityCompat.requestPermissions(this, permissions, REQUEST_READ_PERMISSION);
 
         settings = new Intent(this, Settings.class);
@@ -80,47 +79,33 @@ public class MainActivity extends AppCompatActivity {
 
         handlerStartAlarm = new Handler();
 
-        //toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
 
-        Button test = (Button) findViewById(R.id.button2);
-        test.setOnClickListener((
-                new Button.OnClickListener() {
-                    public void onClick(View v) {
 
-                        Log.d("test", "jag har ingen funktionalitet atm");
-
-                    }
-                }
-        ));
-
-
-        /** Sleep history button **/
+        /** Sleep history button
         Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
         sleepHistory.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Click event trigger here
             }
-        });
+        });**/
 
         /** Active button **/
         ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    fixAlarmTime();
+                    //Start background sensors (get this shit running)
                     startSensorBackground(sensitivity);
-                    // The toggle is enabled
-                    Log.d("test", "toggle - ENABLED");
                 } else {
                     stopService(sensors);
                     handlerStartAlarm.removeCallbacks(runnableExecuteAlarm);
                     if(wakeLockAlarm != null) {
                         wakeLockAlarm.release();
                     }
-                    // The toggle is disabled
-                    Log.d("test", "toggle - DISABLED");
                 }
             }
         });
@@ -129,11 +114,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private long fixAlarmTime(){
+        //Settings for alarmtime
+        EditText hoursTxt = (EditText) findViewById(R.id.editTextHours);
+        int hours = Integer.parseInt(hoursTxt.getText().toString());
+        EditText minTxt = (EditText) findViewById(R.id.editTextMinutes);
+        int minutes = Integer.parseInt(minTxt.getText().toString());
+        return convertHourToMilli(hours+minutes);
+    }
+
 
     public void startSensorBackground(int sensitivity) {
         sensors = new Intent(this, Accelerometer.class);
         sensors.putExtra("sensitivity", sensitivity);
-        Log.d("test", "startSensorBackground :" + sensitivity);
+        sensors.putExtra("alarmtime", alarmTime);
         startService(sensors);
     }
 
@@ -143,7 +137,8 @@ public class MainActivity extends AppCompatActivity {
             case (1):
                 if (resultCode == RESULT_OK) {
                     sensitivity = intent.getIntExtra("sensitivity", 50);
-                    Log.d("test", "onActivityResult x:" + sensitivity);
+                    startAlarmTimeHour = intent.getIntExtra("hour", 0);
+                    startAlarmTimeMinute = intent.getIntExtra("minute", 30);
                 } else {
                     Log.d("test", "SettingSetFailed" + resultCode);
                 }
@@ -151,16 +146,12 @@ public class MainActivity extends AppCompatActivity {
             case (2):
                 if (resultCode == RESULT_OK) {
                     if(intent.getBooleanExtra("snooze", false)) {
-                        //ÄNDRA 10000 TILL SNOOZE TID
-                        startSnoozeAlarm(10000);
+                        startSnoozeAlarm(convertMinuteToMilli(5));
                     } else {
-                        //KNAPPEN FRÅN GRÖN TILL RÖD??
-                        stopService(sensors);
-                        if(wakeLockAlarm != null) {
-                            wakeLockAlarm.release();
-                        }
+                        //toggles the button in order to kill sensor thread.
+                        ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);
+                        toggle.toggle();
                     }
-                    Log.d("test", "AlarmReturn");
                 } else {
                     Log.d("test", "AlarmReturnFailed" + resultCode);
                 }
@@ -168,10 +159,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Inflate the default menu forcing it to obey my rules.
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -180,16 +171,11 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
-                Log.d("test", "Clicked toolbar action_settings");
                 settings.putExtra("sensitivity", sensitivity);
+                settings.putExtra("hour", startAlarmTimeHour);
+                settings.putExtra("minute", startAlarmTimeMinute);
                 startActivityForResult(settings, 1);
                 return true;
-
-            /**case R.id.action_test:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
-                Log.d("test", "Toolbar action_test");
-                return true; **/
 
             default:
                 // If we got here, the user's action was not recognized.
@@ -216,7 +202,16 @@ public class MainActivity extends AppCompatActivity {
                 permissionToReadAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
-        if (!permissionToReadAccepted) finish();
+        if (!permissionToReadAccepted){
+            finish();
+        }
 
+    }
+
+    private long convertHourToMilli(int hour) {
+        return hour * (3600*1000);
+    }
+    private long convertMinuteToMilli(int minute) {
+        return minute * (60 * 1000);
     }
 }

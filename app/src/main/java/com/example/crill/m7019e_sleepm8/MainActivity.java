@@ -18,9 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
@@ -39,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private int sensitivity = 50;
     private long alarmTime = 10000;
     private int startAlarmTimeHour = 0;
-    private long startAlarmTimeMinute = 30;
+    private int startAlarmTimeMinute = 30;
+    private int hours = 8;
+    private int minutes = 0;
 
     private Runnable runnableExecuteAlarm = new Runnable() {
         @Override
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    fixAlarmTime();
+                    alarmTime = convertHourToMilli(hours) + convertMinuteToMilli(minutes);
                     //Start background sensors (get this shit running)
                     startSensorBackground(sensitivity);
                 } else {
@@ -110,17 +112,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final EditText hoursTxt = (EditText) findViewById(R.id.editTextHours);
+        hoursTxt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    // code to execute when EditText loses focus
+                    Log.d("test", "Dropped focus from editTextHours");
+                    hours = Integer.parseInt(hoursTxt.getText().toString());
+                    Log.d("test", "hours is: " + hours);
+                }
+            }
+        });
+
+        final EditText minTxt = (EditText) findViewById(R.id.editTextMinutes);
+        minTxt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    // code to execute when EditText loses focus
+                    Log.d("test", "Dropped focus from editTextMinutes");
+                    minutes = Integer.parseInt(minTxt.getText().toString());
+                    Log.d("test", "minutes is: " + minutes);
+                }
+            }
+        });
 
 
-    }
-
-    private long fixAlarmTime(){
-        //Settings for alarmtime
-        EditText hoursTxt = (EditText) findViewById(R.id.editTextHours);
-        int hours = Integer.parseInt(hoursTxt.getText().toString());
-        EditText minTxt = (EditText) findViewById(R.id.editTextMinutes);
-        int minutes = Integer.parseInt(minTxt.getText().toString());
-        return convertHourToMilli(hours+minutes);
     }
 
 

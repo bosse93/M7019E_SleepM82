@@ -38,7 +38,7 @@ public class Accelerometer extends Service implements SensorEventListener {
             unregister();
             //ÄNDRA 10000 TILL LARM TID
             handlerRunAlarm = new Handler(handlerThread.getLooper());
-            handlerRunAlarm.postDelayed(runnableRunAlarm, 10000);
+            handlerRunAlarm.postDelayed(runnableRunAlarm, alarmTime);
         }
     };
 
@@ -87,7 +87,7 @@ public class Accelerometer extends Service implements SensorEventListener {
 
         //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
         handlerStartAlarm = new Handler(handlerThread.getLooper());
-        handlerStartAlarm.postDelayed(runnableStartAlarm, alarmTime);
+        handlerStartAlarm.postDelayed(runnableStartAlarm, 10000); //Byt till något annat
 
 
         return START_STICKY;

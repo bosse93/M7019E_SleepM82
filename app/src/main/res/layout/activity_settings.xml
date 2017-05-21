@@ -45,22 +45,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/sensetivitySeekbar"
+        android:layout_marginTop="50dp"
+        android:textSize="30dp"
         android:ems="10"
         android:text="Sensor Time:"
         android:textAlignment="textStart"
         />
 
     <EditText
-        android:id="@+id/editText2"
-        android:layout_width="30dp"
+        android:id="@+id/editTextHours"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/sensetivitySeekbar"
+        android:layout_below="@+id/sensorText"
         android:layout_marginTop="10dp"
         android:ems="10"
         android:inputType="time"
-
-        android:textAlignment="textEnd"
+        android:hint="hh"
+        android:textAlignment="center"
         android:selectAllOnFocus="true"
         />
 
@@ -68,23 +70,24 @@
         android:id="@+id/editText3"
         android:layout_width="10dp"
         android:layout_height="25dp"
-        android:layout_alignBottom="@+id/editText2"
-        android:layout_toRightOf="@+id/editText2"
+        android:layout_alignBottom="@+id/editTextHours"
+        android:layout_toRightOf="@+id/editTextHours"
         android:ems="10"
         android:text=":"
         android:textAlignment="center"
         />
 
     <EditText
-        android:id="@+id/editText4"
-        android:layout_width="30dp"
+        android:id="@+id/editTextMinutes"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/editText2"
+        android:layout_alignBottom="@+id/editTextHours"
         android:layout_toEndOf="@+id/editText3"
         android:ems="10"
         android:inputType="time"
-        android:textAlignment="textStart"
+        android:textAlignment="center"
         android:selectAllOnFocus="true"
+        android:hint="mm"
         />
 </RelativeLayout>
 

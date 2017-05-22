@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -25,6 +24,8 @@ import android.widget.ToggleButton;
 
 
 public class MainActivity extends AppCompatActivity {
+    boolean development = false;
+
     private static final int REQUEST_READ_PERMISSION = 200;
     private boolean permissionToReadAccepted = false;
     private String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -32,21 +33,24 @@ public class MainActivity extends AppCompatActivity {
     Intent sensors = null;
     Intent settings = null;
 
+    EditText hoursTxt = null;
+    EditText minTxt = null;
+
     Handler handlerStartAlarm = null;
 
     private PowerManager.WakeLock wakeLockAlarm = null;
 
     private int sensitivity = 50;
-    private long alarmTime = 10000;
     private int startAlarmTimeHour = 0;
     private int startAlarmTimeMinute = 30;
-    private int hours = 8;
-    private int minutes = 0;
+    private int alarmTimeHours = 8;
+    private int alarmTimeMinutes = 0;
+    private boolean sensorStarted = false;
 
     private Runnable runnableExecuteAlarm = new Runnable() {
         @Override
         public void run() {
-            Log.d("test", "Larm Runnable Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+            Log.d("test", "Alarm Started Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
             startAlarm();
         }
     };
@@ -84,69 +88,55 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        hoursTxt = (EditText) findViewById(R.id.editTextHours);
+        minTxt = (EditText) findViewById(R.id.editTextMinutes);
+        timeFix(hoursTxt, alarmTimeHours);
+        timeFix(minTxt, alarmTimeMinutes);
 
-
-        /** Sleep history button
-        Button sleepHistory = (Button) findViewById(R.id.sleepHistoryButton);
-        sleepHistory.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Click event trigger here
-            }
-        });**/
 
         /** Active button **/
         ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    alarmTime = convertHourToMilli(hours) + convertMinuteToMilli(minutes);
-                    //Start background sensors (get this shit running)
-                    startSensorBackground(sensitivity);
+                    int tempHour = isValidHour(hoursTxt);
+                    int tempMin = isValidMinute(minTxt);
+                    if(tempHour >= 0 && tempMin >= 0) {
+                        alarmTimeHours = tempHour;
+                        alarmTimeMinutes = tempMin;
+                        timeFix(hoursTxt, alarmTimeHours);
+                        timeFix(minTxt, alarmTimeMinutes);
+                        startSensorBackground();
+                    } else {
+                        invalidNumbers(hoursTxt, minTxt);
+                        ToggleButton toggle = (ToggleButton) findViewById(R.id.activeButton);
+                        toggle.toggle();
+                    }
+
                 } else {
-                    stopService(sensors);
-                    handlerStartAlarm.removeCallbacks(runnableExecuteAlarm);
-                    if(wakeLockAlarm != null) {
-                        wakeLockAlarm.release();
+                    if(sensorStarted) {
+                        stopService(sensors);
+                        sensorStarted = false;
+                        handlerStartAlarm.removeCallbacks(runnableExecuteAlarm);
+                        if (wakeLockAlarm != null) {
+                            wakeLockAlarm.release();
+                            wakeLockAlarm = null;
+                        }
                     }
                 }
             }
         });
-
-        final EditText hoursTxt = (EditText) findViewById(R.id.editTextHours);
-        hoursTxt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    // code to execute when EditText loses focus
-                    Log.d("test", "Dropped focus from editTextHours");
-                    hours = Integer.parseInt(hoursTxt.getText().toString());
-                    Log.d("test", "hours is: " + hours);
-                }
-            }
-        });
-
-        final EditText minTxt = (EditText) findViewById(R.id.editTextMinutes);
-        minTxt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    // code to execute when EditText loses focus
-                    Log.d("test", "Dropped focus from editTextMinutes");
-                    minutes = Integer.parseInt(minTxt.getText().toString());
-                    Log.d("test", "minutes is: " + minutes);
-                }
-            }
-        });
-
-
     }
 
 
-    public void startSensorBackground(int sensitivity) {
+    public void startSensorBackground() {
         sensors = new Intent(this, Accelerometer.class);
         sensors.putExtra("sensitivity", sensitivity);
-        sensors.putExtra("alarmtime", alarmTime);
+        sensors.putExtra("startalarmtime", (convertHourToMilli(startAlarmTimeHour) + convertMinuteToMilli(startAlarmTimeMinute)));
+        sensors.putExtra("alarmtime", (convertHourToMilli(alarmTimeHours) + convertMinuteToMilli(alarmTimeMinutes)));
         startService(sensors);
+        sensorStarted = true;
+        makeToastAlarmStarted();
     }
 
     @Override
@@ -226,10 +216,80 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private int isValidHour(EditText hoursTxt) {
+        int tempHour;
+        try {
+            if(hoursTxt.getText().length() != 0) {
+                tempHour = Integer.valueOf(hoursTxt.getText().toString());
+                if(tempHour < 0 || tempHour > 23) {
+                    return -1;
+                }
+            } else {
+                tempHour = Integer.valueOf(hoursTxt.getHint().toString());
+            }
+        } catch(NumberFormatException e) {
+            return -1;
+        }
+        return tempHour;
+    }
+    private int isValidMinute(EditText minTxt) {
+        int tempMin;
+        try {
+            if(minTxt.getText().length() != 0) {
+                tempMin = Integer.valueOf(minTxt.getText().toString());
+                if(tempMin < 0 || tempMin > 59) {
+                    return -1;
+                }
+            } else {
+                tempMin = Integer.valueOf(minTxt.getHint().toString());
+            }
+        } catch(NumberFormatException e) {
+            return -1;
+        }
+        return tempMin;
+    }
+
+    private void invalidNumbers(EditText hoursTxt, EditText minTxt){
+        Toast.makeText(this, "Not a valid time. Enter 00:00 - 23.59.", Toast.LENGTH_LONG).show();
+        hoursTxt.getText().clear();
+        minTxt.getText().clear();
+    }
+
     private long convertHourToMilli(int hour) {
-        return hour * (3600*1000);
+        if(development) {
+            return 2500;
+        } else {
+            return hour * (3600*1000);
+        }
     }
     private long convertMinuteToMilli(int minute) {
-        return minute * (60 * 1000);
+        if(development) {
+            return 2500;
+        } else {
+            return minute * (60 * 1000);
+        }
+    }
+    private void timeFix(EditText edit, int time) {
+        if(time < 10) {
+            edit.setHint(0 + String.valueOf(time));
+        } else {
+            edit.setHint(String.valueOf(time));
+        }
+    }
+
+    private void makeToastAlarmStarted(){
+        String tempAlarmTimeHours;
+        String tempAlarmTimeMinutes;
+        if(alarmTimeHours < 10) {
+            tempAlarmTimeHours = "0" + String.valueOf(alarmTimeHours);
+        } else {
+            tempAlarmTimeHours = String.valueOf(alarmTimeHours);
+        }
+        if(alarmTimeMinutes < 10) {
+            tempAlarmTimeMinutes = "0" + String.valueOf(alarmTimeMinutes);
+        } else {
+            tempAlarmTimeMinutes = String.valueOf(alarmTimeMinutes);
+        }
+        Toast.makeText(this, "Alarm set! \nWe will wake you up in " + tempAlarmTimeHours + ":" + tempAlarmTimeMinutes + ".\nFrom when you fall asleep!", Toast.LENGTH_LONG).show();
     }
 }

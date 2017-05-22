@@ -33,10 +33,8 @@ public class Accelerometer extends Service implements SensorEventListener {
     private Runnable runnableStartAlarm = new Runnable() {
         @Override
         public void run() {
-            Log.d("test", "Larm schema lagt");
-            Log.d("test", "Runnable Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+            Log.d("test", "Larm Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
             unregister();
-            //ÄNDRA 10000 TILL LARM TID
             handlerRunAlarm = new Handler(handlerThread.getLooper());
             handlerRunAlarm.postDelayed(runnableRunAlarm, alarmTime);
         }
@@ -45,7 +43,7 @@ public class Accelerometer extends Service implements SensorEventListener {
     private Runnable runnableRunAlarm = new Runnable() {
         @Override
         public void run() {
-            Log.d("test", "LarmLARM");
+            Log.d("test", "Alarm Started!");
             sendMessage("executeAlarm", 2);
         }
     };
@@ -55,11 +53,12 @@ public class Accelerometer extends Service implements SensorEventListener {
     private double defaultSens = 10.0;
     private double sensitivity;
     private long alarmTime;
+    private long startAlarmTime;
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("test", "Start Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
+        Log.d("test", "Start Sensor Thread: " + Looper.getMainLooper().getThread().getName() + " " + Looper.getMainLooper().getThread().getId());
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLockAlarm = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
@@ -70,9 +69,9 @@ public class Accelerometer extends Service implements SensorEventListener {
         sensitivity = ((defaultSens/100) * (100 - sensitivityPercent));
 
         //Fix alarm time
-        alarmTime = intent.getLongExtra("alarmtime", 0);
+        alarmTime = intent.getLongExtra("alarmtime", 5000);
+        startAlarmTime = intent.getLongExtra("startalarmtime", 5000);
 
-        Log.d("test", "Changed sensitivty in acc "+sensitivity);
         handlerThread = new HandlerThread("MyHandlerThread");
         handlerThread.start();
 
@@ -81,20 +80,18 @@ public class Accelerometer extends Service implements SensorEventListener {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         // Get Accelerometer sensor
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Log.d("test onCreateSensor", "det körs automagiskt när jag gör klassen");
         handlerSensor = new Handler(handlerThread.getLooper());
         register();
 
-        //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
         handlerStartAlarm = new Handler(handlerThread.getLooper());
-        handlerStartAlarm.postDelayed(runnableStartAlarm, 10000); //Byt till något annat
+        handlerStartAlarm.postDelayed(runnableStartAlarm, startAlarmTime);
 
 
         return START_STICKY;
     }
 
     public void register() {
-        Log.d("test", "Register Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
+        Log.d("test", "Register Sensor Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL, handlerSensor);
     }
 
@@ -123,7 +120,6 @@ public class Accelerometer extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (!mInitialized) {
-            Log.d("test", "Initalizing sensors");
             mInitialized = true;
         } else {
             float xChange = history[0] - event.values[0];
@@ -134,14 +130,12 @@ public class Accelerometer extends Service implements SensorEventListener {
 
 
             if (abs(xChange) > sensitivity){
-                //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
-                startAlarm(10000);
+                queueAlarm(startAlarmTime);
                 Log.d("test", "Sensor Change Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
             }
 
             if (abs(yChange) > sensitivity){
-                //ÄNDRA 10000 TILL TID FRÅN ACTIVATE TILL START LARM
-                startAlarm(10000);
+                queueAlarm(startAlarmTime);
                 Log.d("test", "Sensor Change Thread " + Thread.currentThread().getName() + " " + Thread.currentThread().getId());
             }
         }
@@ -152,7 +146,7 @@ public class Accelerometer extends Service implements SensorEventListener {
 
     }
 
-    private void startAlarm(long alarmTime) {
+    private void queueAlarm(long alarmTime) {
         handlerStartAlarm.removeCallbacks(runnableStartAlarm);
         handlerStartAlarm.postDelayed(runnableStartAlarm, alarmTime);
     }
